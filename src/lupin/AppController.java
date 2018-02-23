@@ -3,8 +3,10 @@ package lupin;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.stage.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -19,45 +21,49 @@ import java.io.IOException;
 */
 
 public class AppController {
+    private final FileChooser chooser = new FileChooser();
     @FXML
     private TextField chooseFileInfo;
     @FXML
     private TextField cipherKeyInput;
-    private File file;
-    private final FileChooser chooser = new FileChooser();
-    private byte[] fileData;
+    @FXML
+    private TextArea filePreview;
     private String key;
+    private File file;
+    private byte[] fileData;
+    private File newFile;
+    private byte[] newFileData;
 
     public AppController() {
         chooser.setTitle("Choose a file to encrypt/decrypt");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text File (*.txt)", "*.txt"));
     }
 
     @FXML
     private void onChooseFile(ActionEvent event) {
-        setFile(chooser.showOpenDialog(getWindowFromEvent(event)));
+        File file = chooser.showOpenDialog(getWindowFromEvent(event));
+        if (file != null) setFile(file);
     }
 
     @FXML
-    private void onEncryptFile(ActionEvent event) {
+    private void onEncryptFile() {
         try {
             fetchChiperKey();
-            fetchFileData();
             encryptFileData();
             setNewFileWithPrefix("encr-");
-            saveFileData();
+            saveNewFile();
         } catch (Exception e) {
             showException(e);
         }
     }
 
     @FXML
-    private void onDecryptFile(ActionEvent event) {
+    private void onDecryptFile() {
         try {
             fetchChiperKey();
-            fetchFileData();
             decryptFileData();
             setNewFileWithPrefix("decr-");
-            saveFileData();
+            saveNewFile();
         } catch (Exception e) {
             showException(e);
         }
@@ -68,33 +74,54 @@ public class AppController {
         if (key == null || key.isEmpty()) throw new Exception("Key can't be empty.");
     }
 
+    private void setNewFileWithPrefix(String prefix) {
+        setNewFile(new File(file.getParent(), prefix + file.getName()));
+    }
+
+    private void setFile(File file) {
+        try {
+            this.file = file;
+            chooseFileInfo.setText(this.file.getAbsolutePath());
+            fetchFileData();
+        } catch (Exception e) {
+            showException(e);
+        }
+    }
+
+    private void setNewFile(File newFile) {
+        this.newFile = newFile;
+    }
+
     private void fetchFileData() throws IOException {
         fileData = FileUtils.readFileToByteArray(file);
+        previewFile();
     }
 
-    private void setNewFileWithPrefix(String prefix) {
-        setFile(new File(file.getParent(), prefix + file.getName()));
-    }
-
-    private void setFile(File newFile) {
-        this.file = newFile;
-        if (file != null) chooseFileInfo.setText(this.file.getAbsolutePath());
+    private void previewFile() {
+        filePreview.setText(new String(fileData));
     }
 
     private void encryptFileData() {
-        for (int i = 0; i < fileData.length; i++) {
-            fileData[i] += key.charAt(i % key.length());
+        copyFileDataToNewFileData();
+        for (int i = 0; i < newFileData.length; i++) {
+            newFileData[i] += key.charAt(i % key.length());
         }
     }
 
     private void decryptFileData() {
-        for (int i = 0; i < fileData.length; i++) {
-            fileData[i] -= key.charAt(i % key.length());
+        copyFileDataToNewFileData();
+        for (int i = 0; i < newFileData.length; i++) {
+            newFileData[i] -= key.charAt(i % key.length());
         }
     }
 
-    private void saveFileData() throws IOException {
-        FileUtils.writeByteArrayToFile(file, fileData);
+    private void copyFileDataToNewFileData() {
+        newFileData = new byte[fileData.length];
+        System.arraycopy(fileData, 0, newFileData, 0, fileData.length);
+    }
+
+    private void saveNewFile() throws IOException {
+        FileUtils.writeByteArrayToFile(newFile, newFileData);
     }
 
     private Window getWindowFromEvent(ActionEvent event) {
