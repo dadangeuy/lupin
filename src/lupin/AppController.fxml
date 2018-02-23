@@ -11,7 +11,7 @@
         <Button mnemonicParsing="false" onAction="#onChooseFile" text="..."/>
     </HBox>
     <TextArea fx:id="filePreview" editable="false" prefWidth="200.0" promptText="File preview..." wrapText="true"/>
-    <TextField fx:id="cipherKeyInput" promptText="Enter a key...">
+    <TextField fx:id="cipherKeyInput" onKeyTyped="#onKeyChanged" promptText="Enter a key...">
         <VBox.margin>
             <Insets/>
         </VBox.margin>

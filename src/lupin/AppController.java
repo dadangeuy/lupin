@@ -7,10 +7,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import lupin.cipher.AsciiCipher;
+import lupin.cipher.StringCipher;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /*
     Program ini dibuat oleh Frieda dan Irsyad
@@ -30,9 +33,10 @@ public class AppController {
     private TextArea filePreview;
     private String key;
     private File file;
-    private byte[] fileData;
+    private String fileData;
     private File newFile;
-    private byte[] newFileData;
+    private String newFileData;
+    private StringCipher cipher = new AsciiCipher();
 
     public AppController() {
         chooser.setTitle("Choose a file to encrypt/decrypt");
@@ -48,7 +52,6 @@ public class AppController {
     @FXML
     private void onEncryptFile() {
         try {
-            fetchChiperKey();
             encryptFileData();
             setNewFileWithPrefix("encr-");
             saveNewFile();
@@ -60,7 +63,6 @@ public class AppController {
     @FXML
     private void onDecryptFile() {
         try {
-            fetchChiperKey();
             decryptFileData();
             setNewFileWithPrefix("decr-");
             saveNewFile();
@@ -69,9 +71,9 @@ public class AppController {
         }
     }
 
-    private void fetchChiperKey() throws Exception {
+    @FXML
+    private void onKeyChanged() {
         key = cipherKeyInput.getText();
-        if (key == null || key.isEmpty()) throw new Exception("Key can't be empty.");
     }
 
     private void setNewFileWithPrefix(String prefix) {
@@ -93,35 +95,20 @@ public class AppController {
     }
 
     private void fetchFileData() throws IOException {
-        fileData = FileUtils.readFileToByteArray(file);
-        previewFile();
-    }
-
-    private void previewFile() {
-        filePreview.setText(new String(fileData));
+        fileData = FileUtils.readFileToString(file, Charset.defaultCharset());
+        filePreview.setText(fileData);
     }
 
     private void encryptFileData() {
-        copyFileDataToNewFileData();
-        for (int i = 0; i < newFileData.length; i++) {
-            newFileData[i] += key.charAt(i % key.length());
-        }
+        newFileData = cipher.encrypt(fileData, key);
     }
 
     private void decryptFileData() {
-        copyFileDataToNewFileData();
-        for (int i = 0; i < newFileData.length; i++) {
-            newFileData[i] -= key.charAt(i % key.length());
-        }
-    }
-
-    private void copyFileDataToNewFileData() {
-        newFileData = new byte[fileData.length];
-        System.arraycopy(fileData, 0, newFileData, 0, fileData.length);
+        newFileData = cipher.decrypt(fileData, key);
     }
 
     private void saveNewFile() throws IOException {
-        FileUtils.writeByteArrayToFile(newFile, newFileData);
+        FileUtils.writeStringToFile(newFile, newFileData, Charset.defaultCharset());
     }
 
     private Window getWindowFromEvent(ActionEvent event) {
