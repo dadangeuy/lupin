@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity"
-      minHeight="-Infinity" minWidth="512.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.121"
+      minHeight="-Infinity" minWidth="800.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="lupin.AppController">
     <HBox alignment="CENTER" spacing="10.0">
         <TextField fx:id="chooseFileInfo" editable="false" promptText="Choose a file..." HBox.hgrow="ALWAYS"/>
@@ -24,10 +24,13 @@
                 text="Save" textAlignment="CENTER"/>
     </VBox>
     <Label text="Decipher"/>
-    <HBox spacing="10.0">
+    <HBox alignment="CENTER" spacing="10.0">
         <TextField fx:id="decipherKeyInput" promptText="Enter most frequently occurring word..." HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="keyLimitInput" maxWidth="100.0" promptText="Max Key"/>
+        <TextField fx:id="resultLimitInput" maxWidth="100.0" promptText="Max Result"/>
         <Button mnemonicParsing="false" onAction="#onDecipherFile" text="Find"/>
     </HBox>
+    <Slider fx:id="matchThresholdInput" max="1.0"/>
     <TextArea fx:id="possibleKeyInput" editable="false" prefRowCount="5" promptText="Possible key result..."
               wrapText="true"/>
     <padding>

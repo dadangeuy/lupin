@@ -1,8 +1,7 @@
 package lupin.cipher;
 
-public class AsciiCipher implements StringCipher {
+public class AsciiCipher {
 
-    @Override
     public String encrypt(String text, String key) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {
@@ -13,7 +12,6 @@ public class AsciiCipher implements StringCipher {
         return sb.toString();
     }
 
-    @Override
     public String decrypt(String text, String key) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < text.length(); i++) {

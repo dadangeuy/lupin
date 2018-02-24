@@ -1,5 +1,7 @@
 package lupin.decipher;
 
+import lupin.cipher.AsciiCipher;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,8 +9,24 @@ import java.util.Map;
 
 public class AsciiDecipher {
     private String text;
+    private AsciiCipher cipher = new AsciiCipher();
+    private double matchThreshold = 0.0;
+    private int maxKeyLength = 10;
+    private int maxResult = 10;
 
-    public List<String> guessCipherKey(String text, String decipherKey, int maxKeyLength, int maxResult) {
+    public void setMatchThreshold(double matchThreshold) {
+        this.matchThreshold = matchThreshold;
+    }
+
+    public void setMaxKeyLength(int maxKeyLength) {
+        this.maxKeyLength = maxKeyLength;
+    }
+
+    public void setMaxResult(int maxResult) {
+        this.maxResult = maxResult;
+    }
+
+    public List<String> guessCipherKey(String text, String decipherKey) {
         this.text = text;
         List<Map.Entry<String, Integer>> fsubstr = findSubstringFrequencies(decipherKey.length());
         List<String> possibleKey = new ArrayList<>();
@@ -16,11 +34,24 @@ public class AsciiDecipher {
             if (entry.getValue() <= 1 || possibleKey.size() > maxResult) break;
             try {
                 String key = getTransformAlphanumericKey(entry.getKey(), decipherKey);
-                if (key.length() <= maxKeyLength) possibleKey.add(key);
+                if (key.length() <= maxKeyLength && matchProbability(key) >= matchThreshold) possibleKey.add(key);
             } catch (Exception ignored) {
             }
         }
         return possibleKey;
+    }
+
+    private double matchProbability(String key) {
+        if (matchThreshold == 0.0) return 1.0;
+        String decrypted = cipher.decrypt(text, key);
+        int total = 0, match = 0;
+        for (int i = 0; i < decrypted.length(); i++) {
+            if (key.charAt(i % key.length()) != '*') {
+                total++;
+                if (isValidKey(decrypted.charAt(i))) match++;
+            }
+        }
+        return 1.0 * match / total;
     }
 
     private String getTransformAlphanumericKey(String from, String to) throws Exception {
@@ -38,6 +69,10 @@ public class AsciiDecipher {
             key.setCharAt(idx, newChar);
         }
         return key.toString();
+    }
+
+    private boolean isValidKey(char c) {
+        return ((c >= ' ' && c <= '~') || c == '\n');
     }
 
     private boolean isAlphanumeric(char c) {

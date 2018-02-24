@@ -3,12 +3,12 @@ package lupin;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lupin.cipher.AsciiCipher;
-import lupin.cipher.StringCipher;
 import lupin.decipher.AsciiDecipher;
 import org.apache.commons.io.FileUtils;
 
@@ -41,9 +41,15 @@ public class AppController {
     private TextArea cipherFileDataPreview;
     @FXML
     private TextArea possibleKeyInput;
+    @FXML
+    private TextField keyLimitInput;
+    @FXML
+    private TextField resultLimitInput;
+    @FXML
+    private Slider matchThresholdInput;
     private String fileData;
     private String cipherFileData;
-    private StringCipher cipher = new AsciiCipher();
+    private AsciiCipher cipher = new AsciiCipher();
     private AsciiDecipher decipher = new AsciiDecipher();
 
     public AppController() {
@@ -88,6 +94,7 @@ public class AppController {
     private void onSaveFile(ActionEvent event) {
         try {
             File file = chooser.showSaveDialog(getWindowFromEvent(event));
+            if (!file.getName().endsWith(".txt")) file = new File(file.getParent(), file.getName() + ".txt");
             FileUtils.writeStringToFile(file, cipherFileData, Charset.defaultCharset());
         } catch (Exception e) {
             showException(e);
@@ -96,21 +103,11 @@ public class AppController {
 
     @FXML
     private void onDecipherFile() {
-        List<String> possibleKey = decipher.guessCipherKey(fileData, getDecipherKey(), 10, 100);
+        decipher.setMaxKeyLength(getKeyLimit());
+        decipher.setMaxResult(getResultLimit());
+        decipher.setMatchThreshold(getMatchThreshold());
+        List<String> possibleKey = decipher.guessCipherKey(fileData, getDecipherKey());
         possibleKeyInput.setText(formatResult(possibleKey));
-    }
-
-    private String formatResult(List<String> list) {
-        if (list.isEmpty()) return "Empty Result";
-        Map<String, Integer> counter = new HashMap<>();
-        for (String str : list) counter.put(str, counter.getOrDefault(str, 0) + 1);
-        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(counter.entrySet());
-        sortedList.sort((a, b) -> b.getValue() - a.getValue());
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Integer> entry : sortedList)
-            sb.append(entry.getKey()).append(", ");
-        sb.delete(sb.length() - 3, sb.length());
-        return sb.toString();
     }
 
     private String getCipherKey() {
@@ -119,6 +116,28 @@ public class AppController {
 
     private String getDecipherKey() {
         return decipherKeyInput.getText();
+    }
+
+    private int getKeyLimit() {
+        String limit = keyLimitInput.getText();
+        try {
+            return Integer.valueOf(limit);
+        } catch (Exception e) {
+            return 10;
+        }
+    }
+
+    private int getResultLimit() {
+        String limit = resultLimitInput.getText();
+        try {
+            return Integer.valueOf(limit);
+        } catch (Exception e) {
+            return 10;
+        }
+    }
+
+    private double getMatchThreshold() {
+        return matchThresholdInput.getValue();
     }
 
     private Window getWindowFromEvent(ActionEvent event) {
@@ -132,5 +151,19 @@ public class AppController {
     private void resetUI() {
         fileDataPreview.setText("");
         cipherFileDataPreview.setText("");
+        possibleKeyInput.setText("");
+    }
+
+    private String formatResult(List<String> list) {
+        if (list.isEmpty()) return "Empty Result";
+        Map<String, Integer> counter = new HashMap<>();
+        for (String str : list) counter.put(str, counter.getOrDefault(str, 0) + 1);
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(counter.entrySet());
+        sortedList.sort((a, b) -> b.getValue() - a.getValue());
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : sortedList)
+            sb.append(entry.getKey()).append(", ");
+        sb.delete(sb.length() - 2, sb.length());
+        return sb.toString();
     }
 }
