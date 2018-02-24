@@ -13,8 +13,11 @@ import lupin.decipher.AsciiDecipher;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /*
     Program ini dibuat oleh Frieda dan Irsyad
@@ -31,32 +34,41 @@ public class AppController {
     @FXML
     private TextField cipherKeyInput;
     @FXML
-    private TextArea filePreview;
-    private String key;
-    private File file;
+    private TextField decipherKeyInput;
+    @FXML
+    private TextArea fileDataPreview;
+    @FXML
+    private TextArea cipherFileDataPreview;
+    @FXML
+    private TextArea possibleKeyInput;
     private String fileData;
-    private File newFile;
-    private String newFileData;
+    private String cipherFileData;
     private StringCipher cipher = new AsciiCipher();
     private AsciiDecipher decipher = new AsciiDecipher();
 
     public AppController() {
-        chooser.setTitle("Choose a file to encrypt/decrypt");
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text File (*.txt)", "*.txt"));
     }
 
     @FXML
     private void onChooseFile(ActionEvent event) {
-        File file = chooser.showOpenDialog(getWindowFromEvent(event));
-        if (file != null) setFile(file);
+        try {
+            File file = chooser.showOpenDialog(getWindowFromEvent(event));
+            this.fileData = FileUtils.readFileToString(file, Charset.defaultCharset());
+            resetUI();
+            chooseFileInfo.setText(file.getAbsolutePath());
+            fileDataPreview.setText(fileData);
+        } catch (NullPointerException ignored) {
+        } catch (Exception e) {
+            showException(e);
+        }
     }
 
     @FXML
     private void onEncryptFile() {
         try {
-            encryptFileData();
-            setNewFileWithPrefix("encr-");
-            saveNewFile();
+            cipherFileData = cipher.encrypt(this.fileData, getCipherKey());
+            cipherFileDataPreview.setText(cipherFileData);
         } catch (Exception e) {
             showException(e);
         }
@@ -65,53 +77,48 @@ public class AppController {
     @FXML
     private void onDecryptFile() {
         try {
-            decryptFileData();
-            setNewFileWithPrefix("decr-");
-            saveNewFile();
+            cipherFileData = cipher.decrypt(this.fileData, getCipherKey());
+            cipherFileDataPreview.setText(cipherFileData);
         } catch (Exception e) {
             showException(e);
         }
     }
 
     @FXML
-    private void onKeyChanged() {
-        key = cipherKeyInput.getText();
-    }
-
-    private void setNewFileWithPrefix(String prefix) {
-        setNewFile(new File(file.getParent(), prefix + file.getName()));
-    }
-
-    private void setFile(File file) {
+    private void onSaveFile(ActionEvent event) {
         try {
-            this.file = file;
-            chooseFileInfo.setText(this.file.getAbsolutePath());
-            fetchFileData();
+            File file = chooser.showSaveDialog(getWindowFromEvent(event));
+            FileUtils.writeStringToFile(file, cipherFileData, Charset.defaultCharset());
         } catch (Exception e) {
             showException(e);
         }
     }
 
-    private void setNewFile(File newFile) {
-        this.newFile = newFile;
+    @FXML
+    private void onDecipherFile() {
+        List<String> possibleKey = decipher.guessCipherKey(fileData, getDecipherKey(), 10, 100);
+        possibleKeyInput.setText(formatResult(possibleKey));
     }
 
-    private void fetchFileData() throws IOException {
-        fileData = FileUtils.readFileToString(file, Charset.defaultCharset());
-        filePreview.setText(fileData);
+    private String formatResult(List<String> list) {
+        if (list.isEmpty()) return "Empty Result";
+        Map<String, Integer> counter = new HashMap<>();
+        for (String str : list) counter.put(str, counter.getOrDefault(str, 0) + 1);
+        List<Map.Entry<String, Integer>> sortedList = new ArrayList<>(counter.entrySet());
+        sortedList.sort((a, b) -> b.getValue() - a.getValue());
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, Integer> entry : sortedList)
+            sb.append(entry.getKey()).append(", ");
+        sb.delete(sb.length() - 3, sb.length());
+        return sb.toString();
     }
 
-    private void encryptFileData() {
-        newFileData = cipher.encrypt(fileData, key);
-        decipher.guessKey(newFileData);
+    private String getCipherKey() {
+        return cipherKeyInput.getText();
     }
 
-    private void decryptFileData() {
-        newFileData = cipher.decrypt(fileData, key);
-    }
-
-    private void saveNewFile() throws IOException {
-        FileUtils.writeStringToFile(newFile, newFileData, Charset.defaultCharset());
+    private String getDecipherKey() {
+        return decipherKeyInput.getText();
     }
 
     private Window getWindowFromEvent(ActionEvent event) {
@@ -120,5 +127,10 @@ public class AppController {
 
     private void showException(Exception e) {
         e.printStackTrace();
+    }
+
+    private void resetUI() {
+        fileDataPreview.setText("");
+        cipherFileDataPreview.setText("");
     }
 }
