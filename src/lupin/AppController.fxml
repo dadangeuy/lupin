@@ -2,24 +2,26 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.121" fx:controller="lupin.AppController">
+      minWidth="512.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.121" fx:controller="lupin.AppController">
     <HBox alignment="CENTER" spacing="10.0">
-        <TextField fx:id="chooseFileInfo" editable="false" minWidth="300.0" promptText="Choose a file..."/>
+        <TextField fx:id="chooseFileInfo" editable="false" promptText="Choose a file..." HBox.hgrow="ALWAYS"/>
         <Button mnemonicParsing="false" onAction="#onChooseFile" text="..."/>
     </HBox>
     <TextArea fx:id="filePreview" editable="false" prefWidth="200.0" promptText="File preview..." wrapText="true"/>
-    <TextField fx:id="cipherKeyInput" onKeyTyped="#onKeyChanged" promptText="Enter a key...">
-        <VBox.margin>
-            <Insets/>
-        </VBox.margin>
-    </TextField>
+    <Label alignment="CENTER" contentDisplay="CENTER" text="Cipher" textAlignment="CENTER"/>
     <HBox alignment="CENTER" spacing="10.0">
+        <TextField fx:id="cipherKeyInput" onKeyTyped="#onKeyChanged" promptText="Enter a key..." HBox.hgrow="ALWAYS"/>
         <Button mnemonicParsing="false" onAction="#onEncryptFile" text="Encrypt"/>
         <Button mnemonicParsing="false" onAction="#onDecryptFile" text="Decrypt"/>
     </HBox>
+    <Label text="Decipher"/>
+    <HBox spacing="10.0">
+        <TextField promptText="Enter most frequently occurring word..." HBox.hgrow="ALWAYS"/>
+        <Button mnemonicParsing="false" text="Find"/>
+    </HBox>
+    <TextField editable="false" promptText="Possible key..."/>
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>

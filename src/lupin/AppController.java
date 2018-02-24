@@ -9,6 +9,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lupin.cipher.AsciiCipher;
 import lupin.cipher.StringCipher;
+import lupin.decipher.AsciiDecipher;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -37,6 +38,7 @@ public class AppController {
     private File newFile;
     private String newFileData;
     private StringCipher cipher = new AsciiCipher();
+    private AsciiDecipher decipher = new AsciiDecipher();
 
     public AppController() {
         chooser.setTitle("Choose a file to encrypt/decrypt");
@@ -101,6 +103,7 @@ public class AppController {
 
     private void encryptFileData() {
         newFileData = cipher.encrypt(fileData, key);
+        decipher.guessKey(newFileData);
     }
 
     private void decryptFileData() {
