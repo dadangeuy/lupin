@@ -1,24 +1,14 @@
 package lupin.cipher;
 
-public class AsciiCipher {
+public class AsciiCipher extends BaseCipher {
 
-    public String encrypt(String text, String key) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < text.length(); i++) {
-            char newChar = text.charAt(i);
-            newChar += key.charAt(i % key.length());
-            sb.append(newChar);
-        }
-        return sb.toString();
+    @Override
+    public char encrypt(char textChar, int position) {
+        return (char) (textChar + getKey(position));
     }
 
-    public String decrypt(String text, String key) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < text.length(); i++) {
-            char newChar = text.charAt(i);
-            newChar -= key.charAt(i % key.length());
-            sb.append(newChar);
-        }
-        return sb.toString();
+    @Override
+    public char decrypt(char textChar, int position) {
+        return (char) (textChar - getKey(position));
     }
 }

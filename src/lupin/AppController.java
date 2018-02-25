@@ -9,7 +9,9 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lupin.cipher.AsciiCipher;
+import lupin.cipher.Cipherable;
 import lupin.decipher.AsciiDecipher;
+import lupin.decipher.Decipherable;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -49,8 +51,8 @@ public class AppController {
     private Slider matchThresholdInput;
     private String fileData;
     private String cipherFileData;
-    private AsciiCipher cipher = new AsciiCipher();
-    private AsciiDecipher decipher = new AsciiDecipher();
+    private Cipherable cipher = new AsciiCipher();
+    private Decipherable decipher = new AsciiDecipher();
 
     public AppController() {
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text File (*.txt)", "*.txt"));
@@ -73,7 +75,8 @@ public class AppController {
     @FXML
     private void onEncryptFile() {
         try {
-            cipherFileData = cipher.encrypt(this.fileData, getCipherKey());
+            cipher.setKey(getCipherKey());
+            cipherFileData = cipher.encrypt(fileData);
             cipherFileDataPreview.setText(cipherFileData);
         } catch (Exception e) {
             showException(e);
@@ -83,7 +86,8 @@ public class AppController {
     @FXML
     private void onDecryptFile() {
         try {
-            cipherFileData = cipher.decrypt(this.fileData, getCipherKey());
+            cipher.setKey(getCipherKey());
+            cipherFileData = cipher.decrypt(fileData);
             cipherFileDataPreview.setText(cipherFileData);
         } catch (Exception e) {
             showException(e);
@@ -103,10 +107,9 @@ public class AppController {
 
     @FXML
     private void onDecipherFile() {
-        decipher.setMaxKeyLength(getKeyLimit());
-        decipher.setMaxResult(getResultLimit());
-        decipher.setMatchThreshold(getMatchThreshold());
-        List<String> possibleKey = decipher.guessCipherKey(fileData, getDecipherKey());
+        decipher.setLimit(getKeyLimit(), getResultLimit(), getMatchThreshold());
+        decipher.setWord(getDecipherKey());
+        List<String> possibleKey = decipher.decipher(fileData);
         possibleKeyInput.setText(formatResult(possibleKey));
     }
 

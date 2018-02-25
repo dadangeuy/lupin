@@ -11,7 +11,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("AppController.fxml"));
-        primaryStage.setTitle("Cipher File");
+        primaryStage.setTitle("Cipher/Decipher File");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
