@@ -6,11 +6,11 @@ public class VigenereCipher extends BaseCipher {
     public char encrypt(char textChar, int position) {
         if (isUppercase(textChar)) {
             int result = baseValue(textChar, 'A') + baseValue(Character.toUpperCase(getKey(position)), 'A');
-            result %= 26;
+            result = positiveMod(result, 26);
             return (char) ('A' + result);
         } else if (isLowercase(textChar)) {
             int result = baseValue(textChar, 'a') + baseValue(Character.toLowerCase(getKey(position)), 'a');
-            result %= 26;
+            result = positiveMod(result, 26);
             return (char) ('a' + result);
         }
         return textChar;
@@ -20,18 +20,18 @@ public class VigenereCipher extends BaseCipher {
     public char decrypt(char textChar, int position) {
         if (isUppercase(textChar)) {
             int result = baseValue(textChar, 'A') - baseValue(Character.toUpperCase(getKey(position)), 'A');
-            result %= 26;
+            result = positiveMod(result, 26);
             return (char) ('A' + result);
         } else if (isLowercase(textChar)) {
             int result = baseValue(textChar, 'a') - baseValue(Character.toUpperCase(getKey(position)), 'a');
-            result %= 26;
+            result = positiveMod(result, 26);
             return (char) ('a' + result);
         }
         return textChar;
     }
 
     private int baseValue(char c, char baseChar) {
-        return baseChar - c;
+        return c - baseChar;
     }
 
     private boolean isUppercase(char c) {
@@ -40,5 +40,9 @@ public class VigenereCipher extends BaseCipher {
 
     private boolean isLowercase(char c) {
         return ('a' <= c && c <= 'z');
+    }
+
+    private int positiveMod(int value, int mod) {
+        return (value % mod + mod) % mod;
     }
 }

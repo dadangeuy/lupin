@@ -11,7 +11,7 @@
         <Button mnemonicParsing="false" onAction="#onChooseFile" text="..."/>
     </HBox>
     <TextArea fx:id="fileDataPreview" editable="false" prefWidth="200.0" promptText="File preview..." wrapText="true"/>
-    <Label alignment="CENTER" contentDisplay="CENTER" text="Cipher" textAlignment="CENTER"/>
+    <ComboBox fx:id="cipherAlgorithmMenu" onAction="#onSelectCipherAlgorithm" promptText="Cipher Algorithm"/>
     <HBox alignment="CENTER" spacing="10.0">
         <TextField fx:id="cipherKeyInput" promptText="Enter a key..." HBox.hgrow="ALWAYS"/>
         <Button mnemonicParsing="false" onAction="#onEncryptFile" text="Encrypt"/>
@@ -23,9 +23,9 @@
         <Button alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onSaveFile"
                 text="Save" textAlignment="CENTER"/>
     </VBox>
-    <Label text="Decipher"/>
+    <ComboBox fx:id="decipherAlgorithmMenu" onAction="#onSelectDecipherAlgorithm" promptText="Decipher Algorithm"/>
     <HBox alignment="CENTER" spacing="10.0">
-        <TextField fx:id="decipherKeyInput" promptText="Enter most frequently occurring word..." HBox.hgrow="ALWAYS"/>
+        <TextField fx:id="decipherKeyInput" promptText="Enter a keyword..." HBox.hgrow="ALWAYS"/>
         <TextField fx:id="keyLimitInput" maxWidth="100.0" promptText="Max Key"/>
         <TextField fx:id="resultLimitInput" maxWidth="100.0" promptText="Max Result"/>
         <Button mnemonicParsing="false" onAction="#onDecipherFile" text="Find"/>

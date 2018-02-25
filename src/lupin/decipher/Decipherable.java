@@ -12,4 +12,6 @@ public interface Decipherable {
     void setLimit(int maxKeyLength, int maxResult, double matchThreshold);
 
     List<String> decipher(String text);
+
+    char reverseEncrypt(char origin, char encrypted) throws Exception;
 }

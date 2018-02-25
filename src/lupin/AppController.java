@@ -3,6 +3,7 @@ package lupin;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -10,6 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import lupin.cipher.AsciiCipher;
 import lupin.cipher.Cipherable;
+import lupin.cipher.VigenereCipher;
 import lupin.decipher.AsciiDecipher;
 import lupin.decipher.Decipherable;
 import org.apache.commons.io.FileUtils;
@@ -49,13 +51,27 @@ public class AppController {
     private TextField resultLimitInput;
     @FXML
     private Slider matchThresholdInput;
+    @FXML
+    private ComboBox<String> cipherAlgorithmMenu;
+    @FXML
+    private ComboBox<String> decipherAlgorithmMenu;
     private String fileData;
     private String cipherFileData;
-    private Cipherable cipher = new AsciiCipher();
-    private Decipherable decipher = new AsciiDecipher();
+    private Cipherable cipher;
+    private Decipherable decipher;
 
     public AppController() {
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text File (*.txt)", "*.txt"));
+    }
+
+    @FXML
+    public void initialize() {
+        cipherAlgorithmMenu.getItems().addAll("ASCII Cipher", "Vigenere Cipher");
+        decipherAlgorithmMenu.getItems().addAll("ASCII Decipher");
+        cipherAlgorithmMenu.getSelectionModel().selectFirst();
+        onSelectCipherAlgorithm();
+        decipherAlgorithmMenu.getSelectionModel().selectFirst();
+        onSelectDecipherAlgorithm();
     }
 
     @FXML
@@ -69,6 +85,27 @@ public class AppController {
         } catch (NullPointerException ignored) {
         } catch (Exception e) {
             showException(e);
+        }
+    }
+
+    @FXML
+    private void onSelectCipherAlgorithm() {
+        switch (cipherAlgorithmMenu.getValue()) {
+            case "ASCII Cipher":
+                cipher = new AsciiCipher();
+                break;
+            case "Vigenere Cipher":
+                cipher = new VigenereCipher();
+                break;
+        }
+    }
+
+    @FXML
+    private void onSelectDecipherAlgorithm() {
+        switch (decipherAlgorithmMenu.getValue()) {
+            case "ASCII Decipher":
+                decipher = new AsciiDecipher();
+                break;
         }
     }
 
@@ -122,18 +159,16 @@ public class AppController {
     }
 
     private int getKeyLimit() {
-        String limit = keyLimitInput.getText();
         try {
-            return Integer.valueOf(limit);
+            return Integer.valueOf(keyLimitInput.getText());
         } catch (Exception e) {
             return 10;
         }
     }
 
     private int getResultLimit() {
-        String limit = resultLimitInput.getText();
         try {
-            return Integer.valueOf(limit);
+            return Integer.valueOf(resultLimitInput.getText());
         } catch (Exception e) {
             return 10;
         }

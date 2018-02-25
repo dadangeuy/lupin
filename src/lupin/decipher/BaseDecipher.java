@@ -77,15 +77,15 @@ public abstract class BaseDecipher implements Decipherable {
         return result;
     }
 
-    private String getKeyFromStringTransformation(String text, String originWord) throws Exception {
-        List<Integer> distance = getWordDistances(text, originWord);
+    private String getKeyFromStringTransformation(String text, String encrWord) throws Exception {
+        List<Integer> distance = getWordDistances(text, encrWord);
         int keyLength = gcd(distance);
         StringBuilder key = new StringBuilder();
         for (int i = 0; i < keyLength; i++) key.append('*');
-        int firstOccur = text.indexOf(originWord) % keyLength;
-        for (int i = 0; i < originWord.length(); i++) {
+        int firstOccur = text.indexOf(encrWord) % keyLength;
+        for (int i = 0; i < encrWord.length(); i++) {
             int idx = (firstOccur + i) % keyLength;
-            char keyChar = (char) (originWord.charAt(i) - word.charAt(i));
+            char keyChar = reverseEncrypt(word.charAt(i), encrWord.charAt(i));
             if (!isAlphanumeric(keyChar)) throw new Exception("Invalid key");
             key.setCharAt(idx, keyChar);
         }
