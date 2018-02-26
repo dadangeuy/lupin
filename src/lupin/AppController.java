@@ -14,6 +14,7 @@ import lupin.cipher.Cipherable;
 import lupin.cipher.VigenereCipher;
 import lupin.decipher.AsciiDecipher;
 import lupin.decipher.Decipherable;
+import lupin.decipher.VigenereDecipher;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -67,7 +68,7 @@ public class AppController {
     @FXML
     public void initialize() {
         cipherAlgorithmMenu.getItems().addAll("ASCII Cipher", "Vigenere Cipher");
-        decipherAlgorithmMenu.getItems().addAll("ASCII Decipher");
+        decipherAlgorithmMenu.getItems().addAll("ASCII Decipher", "Vigenere Decipher");
         cipherAlgorithmMenu.getSelectionModel().selectFirst();
         onSelectCipherAlgorithm();
         decipherAlgorithmMenu.getSelectionModel().selectFirst();
@@ -105,6 +106,9 @@ public class AppController {
         switch (decipherAlgorithmMenu.getValue()) {
             case "ASCII Decipher":
                 decipher = new AsciiDecipher();
+                break;
+            case "Vigenere Decipher":
+                decipher = new VigenereDecipher();
                 break;
         }
     }

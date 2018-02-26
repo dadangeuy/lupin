@@ -13,5 +13,4 @@ public interface Decipherable {
 
     List<String> decipher(String text);
 
-    char reverseEncrypt(char origin, char encrypted) throws Exception;
 }

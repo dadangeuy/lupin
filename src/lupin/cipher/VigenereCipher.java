@@ -23,7 +23,7 @@ public class VigenereCipher extends BaseCipher {
             result = positiveMod(result, 26);
             return (char) ('A' + result);
         } else if (isLowercase(textChar)) {
-            int result = baseValue(textChar, 'a') - baseValue(Character.toUpperCase(getKey(position)), 'a');
+            int result = baseValue(textChar, 'a') - baseValue(Character.toLowerCase(getKey(position)), 'a');
             result = positiveMod(result, 26);
             return (char) ('a' + result);
         }
