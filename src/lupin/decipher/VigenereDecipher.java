@@ -40,7 +40,7 @@ public class VigenereDecipher extends BaseDecipher {
             int idx = (firstOccur + i) % keyLength;
             if (!isCaseMatch(word.charAt(i), encrWord.charAt(i))) throw new Exception("Invalid word");
             char keyChar = reverseKey(word.charAt(i), encrWord.charAt(i));
-            key.setCharAt(idx, keyChar);
+            if (keyChar != '*') key.setCharAt(idx, keyChar);
         }
         return key.toString();
     }
@@ -54,7 +54,7 @@ public class VigenereDecipher extends BaseDecipher {
     }
 
     private boolean isCaseMatch(char a, char b) {
-        return ((isUppercase(a) && isUppercase(b)) || (isLowercase(a) && isLowercase(b)));
+        return ((isUppercase(a) && isUppercase(b)) || (isLowercase(a) && isLowercase(b)) || a == b);
     }
 
     private char reverseKey(char origin, char encrypted) {
@@ -72,6 +72,10 @@ public class VigenereDecipher extends BaseDecipher {
 
     private int baseValue(char c, char baseChar) {
         return baseChar - c;
+    }
+
+    private boolean isAlphabet(char c) {
+        return (isUppercase(c) || isLowercase(c));
     }
 
     private boolean isUppercase(char c) {
