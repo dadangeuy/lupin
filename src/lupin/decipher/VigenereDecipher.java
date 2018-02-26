@@ -54,7 +54,7 @@ public class VigenereDecipher extends BaseDecipher {
     }
 
     private boolean isCaseMatch(char a, char b) {
-        return ((isUppercase(a) && isUppercase(b)) || (isLowercase(a) && isLowercase(b)) || a == b);
+        return (a == b || (isUppercase(a) && isUppercase(b)) || (isLowercase(a) && isLowercase(b)));
     }
 
     private char reverseKey(char origin, char encrypted) {
